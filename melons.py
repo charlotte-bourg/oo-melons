@@ -12,12 +12,21 @@ class AbstractMelonOrder:
         self.qty = qty
         self.shipped = False
         self.country_code = country_code
+        if self.qty > 100:
+            raise TooManyMelonsError
+
+    @staticmethod  
+    def get_base_price():
         
-    def get_base_price(self):
-        datetime.weekday() #integer representing day of week; monday = 0 
-        datetime.time.hour() #hour of day
-        #if datetime.weekday() in range(0,5) and datetime.time.time in range(8,11)
-        return random.randint(5,9)
+        current_datetime = datetime.datetime.now()
+        day_of_week = current_datetime.weekday() # integer representing day of week; monday = 0 
+        hour = current_datetime.hour
+
+        base_price = random.randint(5,9)
+
+        if day_of_week in range(0,5) and hour in range(8,11): 
+            base_price += 4
+        return base_price
     
     def get_total(self):
         """Calculate price, including tax."""
@@ -38,11 +47,11 @@ class AbstractMelonOrder:
 
         return self.country_code
 
-    # the following 2 lines can be included, but are not necessary because 
-    # AbstractMelonOrder should never be instantiated directly
-
-    # order_type = None
-    # tax = 0
+class TooManyMelonsError(ValueError):
+    "Raised when order quantity is > 100"
+    def __init__(self, message = "No more than 100 melons!"):
+        self.message = message
+        super().__init__(self.message)
  
 class DomesticMelonOrder(AbstractMelonOrder):
     """A melon order within the USA."""
